@@ -1,3 +1,5 @@
+import time
+import random
 import streamlit as st
 import requests
 import pandas as pd
