@@ -6,7 +6,7 @@ from sklearn.linear_model import LinearRegression
 st.set_page_config(page_title="Sustainable Weather AI Chatbot")
 st.title("🌍 Sustainable Weather AI Chatbot")
 
-API_KEY = "API_KEY = st.secrets["OPENWEATHER_API_KEY"]"
+API_KEY = st.secrets["OPENWEATHER_API_KEY"]
 
 def get_weather(city):
     url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={API_KEY}&units=metric"
