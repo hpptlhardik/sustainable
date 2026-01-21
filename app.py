@@ -156,5 +156,53 @@ if user_question:
     else:
         st.write("I can answer questions on weather, climate change, and sustainability.")
 
+PASS_MARK = 2  # change as needed
 
+if score >= PASS_MARK:
+    st.balloons()
+    st.success("🎉 Congratulations! You passed.")
+
+    name = st.text_input("Enter your name for certificate")
+
+    if name:
+        pdf = generate_certificate(name, score, 2)
+
+        st.download_button(
+            label="📄 Download Certificate",
+            data=pdf,
+            file_name="certificate.pdf",
+            mime="application/pdf"
+        )
+else:
+    st.error("❌ Score too low for certificate.")
+
+def generate_certificate(name, score, total):
+    buffer = io.BytesIO()
+    c = canvas.Canvas(buffer, pagesize=A4)
+
+    c.setFont("Helvetica-Bold", 30)
+    c.setFillColor(green)
+    c.drawCentredString(300, 750, "Certificate of Achievement")
+
+    c.setFont("Helvetica", 18)
+    c.setFillColor(black)
+    c.drawCentredString(300, 680, "This is proudly presented to")
+
+    c.setFont("Helvetica-Bold", 24)
+    c.drawCentredString(300, 640, name)
+
+    c.setFont("Helvetica", 16)
+    c.drawCentredString(
+        300, 600,
+        f"For scoring {score}/{total} in Sustainable Climate Quiz"
+    )
+
+    c.setFont("Helvetica", 14)
+    c.drawCentredString(300, 550, f"Date: {date.today()}")
+
+    c.showPage()
+    c.save()
+
+    buffer.seek(0)
+    return buffer
 
