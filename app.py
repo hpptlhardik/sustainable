@@ -45,16 +45,111 @@ model.fit(df[["humidity", "pressure"]], df["temp"])
 if st.button("Predict Temperature"):
     pred = model.predict([[humidity, pressure]])
     st.success(f"Predicted Temperature: {pred[0]:.2f} °C")
+ 
+
+# Initialize timer
+if "quiz_start_time" not in st.session_state:
+    st.session_state.quiz_start_time = time.time()
+
+TIME_LIMIT = 60  # seconds
+elapsed = int(time.time() - st.session_state.quiz_start_time)
+time_left = TIME_LIMIT - elapsed
+
+timer_placeholder = st.empty()
+timer_placeholder.info(f"⏱️ Time left: {time_left} seconds")
+
+# Stop quiz when time is over
+if time_left <= 0:
+    st.warning("⏰ Time is up! Quiz submitted.")
+    st.session_state.time_up = True
+else:
+    st.session_state.time_up = False
 
 st.subheader("📝 Climate Quiz")
 
-q1 = st.radio("Which gas causes global warming?", ["Carbon Dioxide", "Oxygen"])
-q2 = st.radio("Which energy is renewable?", ["Solar", "Coal"])
+# Quiz questions
+q1 = st.radio(
+    "Which gas causes global warming?",
+    ["Carbon Dioxide", "Oxygen"],
+    key="q1"
+)
 
+q2 = st.radio(
+    "Which energy is renewable?",
+    ["Solar", "Coal"],
+    key="q2"
+)
+
+# Calculate score
 score = 0
 if q1 == "Carbon Dioxide":
     score += 1
 if q2 == "Solar":
     score += 1
 
-st.success(f"🏆 Your Score: {score}/2")
+# Show result
+if st.session_state.time_up or st.button("Submit Quiz"):
+    st.success(f"✅ Your score: {score}/2")
+    st.session_state.quiz_completed = True
+    st.stop()
+
+# Auto refresh every second
+time.sleep(1)
+st.experimental_rerun()
+all_questions = [
+    ("Which gas causes global warming?", 
+     ["Carbon Dioxide", "Oxygen", "Nitrogen"], 
+     "Carbon Dioxide"),
+
+    ("Which energy source is renewable?", 
+     ["Solar", "Coal", "Oil"], 
+     "Solar"),
+
+    ("Which activity increases carbon footprint?", 
+     ["Using public transport", "Burning fossil fuels", "Planting trees"], 
+     "Burning fossil fuels"),
+
+    ("What causes climate change?", 
+     ["Greenhouse gases", "Rainfall", "Wind"], 
+     "Greenhouse gases"),
+
+    ("Which is a sustainable practice?", 
+     ["Deforestation", "Recycling", "Plastic burning"], 
+     "Recycling")
+]
+
+random.shuffle(all_questions)
+quiz_questions = all_questions[:3]   # show 3 random questions
+import os
+
+LEADERBOARD_FILE = "leaderboard.csv"
+
+if not os.path.exists(LEADERBOARD_FILE):
+    df = pd.DataFrame(columns=["Name", "Score"])
+    df.to_csv(LEADERBOARD_FILE, index=False)
+
+name = st.text_input("Enter your name for leaderboard")
+
+if st.button("Submit Score"):
+    df = pd.read_csv(LEADERBOARD_FILE)
+    df = df.append({"Name": name, "Score": score}, ignore_index=True)
+    df.to_csv(LEADERBOARD_FILE, index=False)
+    st.success("Score saved!")
+st.subheader("🏆 Leaderboard")
+st.table(pd.read_csv(LEADERBOARD_FILE).sort_values(by="Score", ascending=False))
+st.subheader("🤖 Ask the Sustainable Weather Bot")
+
+user_question = st.text_input("Ask a question about climate or weather")
+
+if user_question:
+    if "climate" in user_question.lower():
+        st.write("Climate refers to long-term weather patterns.")
+    elif "sustainable" in user_question.lower():
+        st.write("Sustainability means meeting needs without harming future generations.")
+    elif "global warming" in user_question.lower():
+        st.write("Global warming is caused by greenhouse gases trapping heat.")
+    else:
+        st.write("I can answer questions on weather, climate change, and sustainability.")
+
+
+
