@@ -72,25 +72,9 @@ else:
 
 st.subheader("📝 Climate Quiz")
 
-# Quiz questions
-q1 = st.radio(
-    "Which gas causes global warming?",
-    ["Carbon Dioxide", "Oxygen"],
-    key="q1"
-)
 
-q2 = st.radio(
-    "Which energy is renewable?",
-    ["Solar", "Coal"],
-    key="q2"
-)
 
-# Calculate score
-score = 0
-if q1 == "Carbon Dioxide":
-    score += 1
-if q2 == "Solar":
-    score += 1
+
 
 # Show result
 if st.session_state.time_up or st.button("Submit Quiz"):
